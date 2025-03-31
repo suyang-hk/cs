@@ -1,2 +1,2 @@
 # cs
-This is my footprint in studying cs.
+hi,瘪佬仔，这是我学习cs的小笔记
