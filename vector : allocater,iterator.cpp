@@ -1,4 +1,5 @@
 #include "iostream"
+#include "ctime"
 using namespace std;
 
 template<typename T>
@@ -106,11 +107,44 @@ public:
         return _last - _first;
     }
 
+    T& operator[](int index){
+        if ( index < 0 || index >= size())
+            throw "the index is avalid";
+            return _first[index];
+    }
+
+    class iterator {
+    public:
+        iterator(T* p = nullptr) : _ptr(p){};
+        bool operator!=(const iterator& it) const {
+            return _ptr != it._ptr;
+        }
+
+        iterator &operator++(){
+            ++_ptr;
+            return *this;
+        }
+
+        T& operator*(){
+            return *_ptr;
+        }
+
+        const T& operator*() const {
+            return *_ptr;
+        }
+    private:
+        T* _ptr;
+
+    };
+
+    iterator begin(){ return iterator(_first); }
+    iterator end(){ return  iterator(_last); }
 private:
     T* _first;
     T* _last;
     T* _end;
     Alloc _allocater;
+
     void expand() {
         int size = _last - _first;
         T* ptmp = _allocater.allocate(2*size);
@@ -129,14 +163,27 @@ private:
 };
 
 int main(){
+    srand(time(0));
    vector<int> a;
-    for(int i = 0;i < 10 ; ++i){
-        a.push_back(i);
+
+    for (int i = 0; i < 20; ++i) {
+        a.push_back(rand()%100 + 1);
     }
-    for(int i = 0;i < 10 ; ++i){
-        std::cout << a.back() << std::endl;
-        a.pop_back();
+
+   vector<int>::iterator it = a.begin();
+    int size = a.size();
+    for( int i = 0; i < size; ++i){
+        cout << a[i] << ".";
     }
+    cout << endl;
+    cout << "----------------------" << endl;
+
+    for(; it != a.end(); ++it){
+        cout << *it << '.';
+    }
+
+    cout << endl;
+
 
 
     return 0;
