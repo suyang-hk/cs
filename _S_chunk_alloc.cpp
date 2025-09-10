@@ -3,23 +3,23 @@ char*
 __default_alloc_template<__threads, __inst>::_S_chunk_alloc(size_t __size, 
                                                             int& __nobjs)
 {
-    char* __result;
-    size_t __total_bytes = __size * __nobjs;
-    size_t __bytes_left = _S_end_free - _S_start_free;
+    char* __result;  //最终返回的内存块地址
+    size_t __total_bytes = __size * __nobjs; //总字节数
+    size_t __bytes_left = _S_end_free - _S_start_free; //剩余的字节数
 
     if (__bytes_left >= __total_bytes) {
         __result = _S_start_free;
         _S_start_free += __total_bytes;
-        return(__result);
+        return(__result); //剩余的字节数足够分配 
     } else if (__bytes_left >= __size) {
-        __nobjs = (int)(__bytes_left/__size);
+        __nobjs = (int)(__bytes_left/__size); //可分配chunk块数目
         __total_bytes = __size * __nobjs;
         __result = _S_start_free;
         _S_start_free += __total_bytes;
         return(__result);
     } else {
         size_t __bytes_to_get = 
-	  2 * __total_bytes + _S_round_up(_S_heap_size >> 4);
+	  2 * __total_bytes + _S_round_up(_S_heap_size >> 4); //分配更多数目的chunk块  _S_round_up(size_t __bytes) { return (((__bytes) + (size_t) _ALIGN-1) & ~((size_t) _ALIGN - 1)); }
         // Try to make use of the left-over piece.
         if (__bytes_left > 0) {
             _Obj* __STL_VOLATILE* __my_free_list =
@@ -27,8 +27,8 @@ __default_alloc_template<__threads, __inst>::_S_chunk_alloc(size_t __size,
 
             ((_Obj*)_S_start_free) -> _M_free_list_link = *__my_free_list;
             *__my_free_list = (_Obj*)_S_start_free;
-        }
-        _S_start_free = (char*)malloc(__bytes_to_get);
+        } //将剩余字节的chunk块分配到其适配的内存链里面 如：剩余8bits 则分配在8bits的chunk块里面
+        _S_start_free = (char*)malloc(__bytes_to_get); 
         if (0 == _S_start_free) {
             size_t __i;
             _Obj* __STL_VOLATILE* __my_free_list;
@@ -48,7 +48,7 @@ __default_alloc_template<__threads, __inst>::_S_chunk_alloc(size_t __size,
                     return(_S_chunk_alloc(__size, __nobjs));
                     // Any leftover piece will eventually make it to the
                     // right free list.
-                }
+                } //遍历所有内存块，查看是否有剩余，如果有，则标记，进行再分配
             }
 	    _S_end_free = 0;	// In case of exception.
             _S_start_free = (char*)malloc_alloc::allocate(__bytes_to_get);
